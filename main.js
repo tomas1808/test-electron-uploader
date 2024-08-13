@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, dialog } = require('electron');
 const log = require('electron-log');
 const { autoUpdater } = require('electron-updater');
 
@@ -57,6 +57,18 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('update-available', (info) => {
   sendStatusToWindow('Update available.');
+
+  // Notify the user about the available update
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update Available',
+    message: 'A new version is available. Would you like to restart and install now?',
+    buttons: ['Restart and Install', 'Later']
+  }).then(result => {
+    if (result.response === 0) { // 'Restart and Install' button pressed
+      autoUpdater.quitAndInstall(false, true); // Install and restart
+    }
+  });
 });
 
 autoUpdater.on('update-not-available', (info) => {
@@ -75,8 +87,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('Update downloaded. Quitting and installing silently...');
-  autoUpdater.quitAndInstall(true, true); // Silent install and force restart after installation
+  sendStatusToWindow('Update downloaded.');
 });
 
 app.on('ready', function () {
@@ -86,12 +97,14 @@ app.on('ready', function () {
 
   createDefaultWindow();
 
-  // Check for updates every 10 seconds
-  setInterval(() => {
-    autoUpdater.checkForUpdates();
-  }, 10000); // 10000 ms = 10 seconds
+  // Check for updates
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 app.on('window-all-closed', () => {
+  // Install update on quit without restarting automatically
+  if (win) {
+    autoUpdater.quitAndInstall(false, false); // Silent install without restart
+  }
   app.quit();
 });
