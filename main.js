@@ -86,7 +86,7 @@ autoUpdater.on('update-downloaded', (info) => {
     buttons: ['Restart and Install', 'Later']
   }).then(result => {
     if (result.response === 0) { // 'Restart and Install' button pressed
-      autoUpdater.quitAndInstall(false, true); // Silent install and restart
+      autoUpdater.quitAndInstall(isSilent = true, isForceRunAfter = true); // Silent install and restart
     }
   });
 });
@@ -110,7 +110,7 @@ app.on('ready', function () {
 app.on('window-all-closed', () => {
   // Install update on quit without restarting automatically
   if (win) {
-    autoUpdater.quitAndInstall(false, false); // Silent install without restart
+    autoUpdater.quitAndInstall(isSilent = true, isForceRunAfter = false); // Silent install without restart
   }
   app.quit();
 });
