@@ -57,18 +57,6 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('update-available', (info) => {
   sendStatusToWindow('Update available.');
-
-  // Notify the user about the available update
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Update Available',
-    message: 'A new version is available. Would you like to restart and install now?',
-    buttons: ['Restart and Install', 'Later']
-  }).then(result => {
-    if (result.response === 0) { // 'Restart and Install' button pressed
-      autoUpdater.quitAndInstall(false, true); // Install and restart
-    }
-  });
 });
 
 autoUpdater.on('update-not-available', (info) => {
@@ -86,8 +74,21 @@ autoUpdater.on('download-progress', (progressObj) => {
   sendStatusToWindow(log_message);
 });
 
+// Show prompt after the update is downloaded
 autoUpdater.on('update-downloaded', (info) => {
   sendStatusToWindow('Update downloaded.');
+
+  // Notify the user about the downloaded update
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Update Ready to Install',
+    message: 'A new version has been downloaded. Would you like to restart and install it now?',
+    buttons: ['Restart and Install', 'Later']
+  }).then(result => {
+    if (result.response === 0) { // 'Restart and Install' button pressed
+      autoUpdater.quitAndInstall(false, true); // Silent install and restart
+    }
+  });
 });
 
 app.on('ready', function () {
@@ -105,7 +106,6 @@ app.on('ready', function () {
     autoUpdater.checkForUpdatesAndNotify();
   }, 60000); // 60000 ms = 1 minute
 });
-
 
 app.on('window-all-closed', () => {
   // Install update on quit without restarting automatically
