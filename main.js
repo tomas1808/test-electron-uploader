@@ -75,8 +75,8 @@ autoUpdater.on('download-progress', (progressObj) => {
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('Update downloaded. Quitting and installing...');
-  autoUpdater.quitAndInstall();
+  sendStatusToWindow('Update downloaded. Quitting and installing silently...');
+  autoUpdater.quitAndInstall(true, true); // Silent install and force restart after installation
 });
 
 app.on('ready', function () {
