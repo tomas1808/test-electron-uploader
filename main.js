@@ -97,9 +97,15 @@ app.on('ready', function () {
 
   createDefaultWindow();
 
-  // Check for updates
+  // Check for updates immediately when the app is ready
   autoUpdater.checkForUpdatesAndNotify();
+
+  // Set an interval to check for updates every 10 minutes (600,000 ms)
+  setInterval(() => {
+    autoUpdater.checkForUpdatesAndNotify();
+  }, 60000); // 60000 ms = 1 minute
 });
+
 
 app.on('window-all-closed', () => {
   // Install update on quit without restarting automatically
